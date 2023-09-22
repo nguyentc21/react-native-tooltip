@@ -1751,6 +1751,19 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@nguyentc21/event-listener@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@nguyentc21/event-listener/-/event-listener-1.0.0.tgz#97a73abe0abc9470d11a8055a0ac1c6bd337ecf1"
+  integrity sha512-jzaz1ujwPmf0pOCmFHYFxNFAFrBFxi32+vr0NS2xobGgMJFoDES1pvLA3y4J29YnrAM6twfncY+5PJD5kKyzQg==
+
+"@nguyentc21/react-native-modal-view@1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@nguyentc21/react-native-modal-view/-/react-native-modal-view-1.1.4.tgz#5a333fff082efabb07a63d0b46e762944964be37"
+  integrity sha512-Ob8tF+nrwMehNNtSqv2B+iCGEVRthg1LJM6xQW8MUL4e+H64i6mX4NqwDJVlVmOlNl6IIP6CQNnd9KGvYkH6cg==
+  dependencies:
+    "@nguyentc21/event-listener" "^1.0.0"
+    react-native-ntc-pressable "^1.0.0"
+
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/eslint-scope-5-internals/-/eslint-scope-5-internals-5.1.1-v1.tgz#dbf733a965ca47b1973177dc0bb6c889edcfb129"
@@ -7937,6 +7950,11 @@ react-native-builder-bob@^0.20.0:
     yargs "^17.5.1"
   optionalDependencies:
     jetifier "^2.0.0"
+
+react-native-ntc-pressable@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-ntc-pressable/-/react-native-ntc-pressable-1.0.0.tgz#606c9025709a4b2b6fd6c55f4de0cbfdabe05226"
+  integrity sha512-APUNmfT9Bez6Bn6+LBS7B2BWdGGUU+HThk1wrx9UsQ30JY53px8evMzK1lrCsqkNgWnMRJ8D+DxbF+ToqRWz4A==
 
 react-native@0.72.4:
   version "0.72.4"

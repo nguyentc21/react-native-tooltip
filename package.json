@@ -1,6 +1,6 @@
 {
   "name": "@nguyentc21/react-native-tooltip",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "description": "Simple tooltip for React native app",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -37,6 +37,7 @@
   },
   "keywords": [
     "react-native",
+    "nguyentc21",
     "@nguyentc21/react-native-tooltip",
     "react-native-tooltip",
     "tooltip"
@@ -54,6 +55,7 @@
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.2.2",
+    "@nguyentc21/react-native-modal-view": "1.1.4",
     "@react-native/eslint-config": "^0.72.2",
     "@release-it/conventional-changelog": "^5.0.0",
     "@types/jest": "^28.1.2",
@@ -77,6 +79,7 @@
     "@types/react": "17.0.21"
   },
   "peerDependencies": {
+    "@nguyentc21/react-native-modal-view": "*",
     "react": "*",
     "react-native": "*"
   },

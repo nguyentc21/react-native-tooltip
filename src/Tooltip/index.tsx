@@ -1,4 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { View, Pressable } from 'react-native';
 import { NestedModal } from '@nguyentc21/react-native-modal-view';
 
@@ -26,8 +32,14 @@ export interface MeasureType {
   pageY: number;
 }
 
-const DEFAULT_CARET_SIZE = 10;
+const DEFAULT_CARET_SIZE = 6;
 const DEFAULT_BORDER_RADIUS = 10;
+const DEFAULT_SAFE_AREA_INSETS = {
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+};
 
 export type EdgeInsets = {
   top: number;
@@ -45,9 +57,15 @@ export type TooltipProps = Omit<NestedModalProps, 'id' | 'visible'> & {
   caretSize?: number;
   disabled?: boolean;
   safeAreaInsets?: EdgeInsets;
+  extraData?: any;
+  hideCaret?: boolean;
+  actionType?: 'onPress' | 'onLongPress';
+};
+export type TooltipRef = {
+  show(): void;
 };
 
-const Tooltip = (props: TooltipProps) => {
+const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
   const {
     containerStyle,
     backdropStyle,
@@ -57,12 +75,10 @@ const Tooltip = (props: TooltipProps) => {
     backdropColor = 'rgba(0,0,0,0.5)',
     placement = 'top',
     caretSize = DEFAULT_CARET_SIZE,
-    safeAreaInsets = {
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-    },
+    safeAreaInsets = DEFAULT_SAFE_AREA_INSETS,
+    extraData,
+    hideCaret,
+    actionType = 'onPress',
   } = props;
 
   const [tooltipContentLayoutState, setTooltipContentLayoutState] =
@@ -82,6 +98,7 @@ const Tooltip = (props: TooltipProps) => {
   const contentRef = useRef<View>(null);
 
   const caretWidth = getCaretWidth(caretSize);
+  const tooltipContentPadding = caretWidth * 0.55 > 10 ? caretWidth * 0.55 : 10;
 
   const { contentPosition, caretPosition } = usePosition({
     safeAreaInsets,
@@ -89,14 +106,18 @@ const Tooltip = (props: TooltipProps) => {
     forcePlacement,
     targetContentLayout: targetContentLayoutState,
     tooltipContentLayout: tooltipContentLayoutState,
-    caretSize: caretSize,
+    caretSize,
+    hideCaret,
   });
+
+  useEffect(() => {
+    setReadyKeyState(Math.random());
+  }, [extraData, targetContentLayoutState, tooltipContentLayoutState]);
 
   const _onOpen = () => {
     if (contentRef.current?.measure) {
       contentRef.current.measure((x, y, width, height, pageX, pageY) => {
         setTargetContentLayoutState({ x, y, width, height, pageX, pageY });
-        setReadyKeyState(Math.random());
       });
     }
   };
@@ -106,45 +127,33 @@ const Tooltip = (props: TooltipProps) => {
     setTooltipContentLayoutState(e.nativeEvent.layout);
   };
 
-  const _onPressTarget = () => {
+  const _show = () => {
     setVisibleState(true);
   };
-  const _close = () => {
+  const _hide = () => {
     setVisibleState(false);
   };
 
-  const _renderTheCaret = () => {
-    return (
-      <View
-        style={[
-          {
-            position: 'absolute',
-            backgroundColor: color,
-            top: caretPosition.top,
-            left: caretPosition.left,
-            transform: [{ rotate: '45deg' }],
-            width: caretSize,
-            height: caretSize,
-          },
-          !!caretPosition.hidden && { display: 'none' },
-        ]}
-      />
-    );
-  };
+  useImperativeHandle(forwardedRef, () => ({
+    show: _show,
+  }));
+
+  const _props =
+    actionType === 'onPress'
+      ? { onPress: _show }
+      : 'onLongPress'
+      ? { onLongPress: _show }
+      : {};
 
   return (
     <>
-      <Pressable
-        ref={contentRef}
-        onPress={_onPressTarget}
-        disabled={!!disabled}
-      >
+      <Pressable ref={contentRef} disabled={!!disabled} {..._props}>
         {props.children}
       </Pressable>
       <NestedModal
         {...props}
         visible={visibleState}
-        close={_close}
+        close={_hide}
         onOpen={_onOpen}
         containerStyle={[
           styles.shadow10,
@@ -159,7 +168,7 @@ const Tooltip = (props: TooltipProps) => {
             left: contentPosition.left,
             borderRadius: DEFAULT_BORDER_RADIUS,
             overflow: 'visible',
-            padding: caretWidth * 0.55 > 10 ? caretWidth * 0.55 : 10,
+            padding: tooltipContentPadding,
           },
           !!contentPosition.hidden && { display: 'none' },
           containerStyle,
@@ -171,12 +180,27 @@ const Tooltip = (props: TooltipProps) => {
           backdropStyle,
         ]}
         onMainContentLayout={_onTooltipLayout}
-        wrapContent={_renderTheCaret}
+        wrapContent={
+          <View
+            style={[
+              {
+                position: 'absolute',
+                backgroundColor: color,
+                top: caretPosition.top,
+                left: caretPosition.left,
+                transform: [{ rotate: '45deg' }],
+                width: caretSize,
+                height: caretSize,
+              },
+              !!caretPosition.hidden && { display: 'none' },
+            ]}
+          />
+        }
         children={props.content}
         updateKey={readyKeyState}
       />
     </>
   );
-};
+});
 
 export default Tooltip;

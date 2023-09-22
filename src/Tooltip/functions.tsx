@@ -3,10 +3,12 @@ import type { TooltipProps, MeasureType, EdgeInsets } from './';
 
 export const BORDER_SPACE_SIZE = 5;
 export const PADDING_SPACE_SIZE = 5;
-export const SAFE_AREA_SIZE = 15;
+export const SAFE_CARET_PADDING_SIZE_RATIO = 0.8;
 
 export const RATIO = 1.414;
 export const getCaretWidth = (caretSize: number) => caretSize * RATIO;
+export const getDiffCaretPosition = (caretSize: number, caretWidth: number) =>
+  (caretWidth - caretSize) * 0.5;
 
 export interface PositionType {
   top: number;
@@ -35,7 +37,8 @@ export const getFitData = (args: {
     safeAreaInsets,
   } = args;
   const { height: tooltipHeight, width: tooltipWidth } = tooltipContentLayout;
-  const caretWidth = caretSize * RATIO;
+
+  const caretWidth = getCaretWidth(caretSize);
 
   const maxContentHeight =
     tooltipHeight + caretWidth + PADDING_SPACE_SIZE + BORDER_SPACE_SIZE;
@@ -148,16 +151,30 @@ export const getLimitCaretPosition = (args: {
   safeAreaInsets: EdgeInsets;
 }): LimitPositionType => {
   const { dimension, caretSize, safeAreaInsets } = args;
-  const caretWidth = caretSize * RATIO;
+
+  const caretWidth = getCaretWidth(caretSize);
+  const diffCaretPosision = getDiffCaretPosition(caretSize, caretWidth);
+
   const limitScreenPosition = getLimitScreenPosition({
     dimension,
     safeAreaInsets,
   });
+  const safeCaretPaddingSize = caretWidth * SAFE_CARET_PADDING_SIZE_RATIO;
   return {
-    minTop: limitScreenPosition.minTop + SAFE_AREA_SIZE,
-    maxTop: limitScreenPosition.maxTop - SAFE_AREA_SIZE - caretWidth,
-    minLeft: limitScreenPosition.minLeft + SAFE_AREA_SIZE,
-    maxLeft: limitScreenPosition.maxLeft - SAFE_AREA_SIZE - caretWidth,
+    minTop:
+      limitScreenPosition.minTop + diffCaretPosision + safeCaretPaddingSize,
+    maxTop:
+      limitScreenPosition.maxTop -
+      caretWidth +
+      diffCaretPosision -
+      safeCaretPaddingSize,
+    minLeft:
+      limitScreenPosition.minLeft + diffCaretPosision + safeCaretPaddingSize,
+    maxLeft:
+      limitScreenPosition.maxLeft -
+      caretWidth +
+      diffCaretPosision -
+      safeCaretPaddingSize,
   };
 };
 
@@ -177,7 +194,7 @@ export const getTooltipPosition = (args: {
     placement,
     safeAreaInsets,
   } = args;
-  const caretWidth = caretSize * RATIO;
+  const caretWidth = getCaretWidth(caretSize);
 
   const { height: tooltipHeight, width: tooltipWidth } = tooltipContentLayout;
   const { height: targetHeight, width: targetWidth } = targetContentLayout;
@@ -243,10 +260,12 @@ export const getCaretPosition = (args: {
     safeAreaInsets,
   } = args;
   const { height: targetHeight, width: targetWidth } = targetContentLayout;
-  const caretWidth = caretSize * RATIO;
 
-  let caretTop = targetContentLayout.pageY + (caretWidth - caretSize) * 0.5,
-    caretLeft = targetContentLayout.pageX + (caretWidth - caretSize) * 0.5,
+  const caretWidth = getCaretWidth(caretSize);
+  const diffCaretPosision = getDiffCaretPosition(caretSize, caretWidth);
+
+  let caretTop = targetContentLayout.pageY + diffCaretPosision,
+    caretLeft = targetContentLayout.pageX + diffCaretPosision,
     hidden = false;
 
   switch (placement) {
@@ -276,16 +295,10 @@ export const getCaretPosition = (args: {
   });
   if (
     caretTop > limitCaretPosition.maxTop ||
-    caretTop < limitCaretPosition.minTop
-  ) {
-    caretTop = 0;
-    hidden = true;
-  }
-  if (
+    caretTop < limitCaretPosition.minTop ||
     caretLeft > limitCaretPosition.maxLeft ||
     caretLeft < limitCaretPosition.minLeft
   ) {
-    caretLeft = 0;
     hidden = true;
   }
   return {
@@ -293,4 +306,35 @@ export const getCaretPosition = (args: {
     left: caretLeft,
     hidden,
   };
+};
+
+export const checkIsXInsideY = (
+  xMeasure: MeasureType,
+  yMeasure: MeasureType,
+  padding: number = 0
+) => {
+  const {
+    pageX: x_pageX,
+    pageY: x_pageY,
+    width: x_width,
+    height: x_height,
+  } = xMeasure;
+  const {
+    pageX: y_pageX,
+    pageY: y_pageY,
+    width: y_width,
+    height: y_height,
+  } = yMeasure;
+  const x_minPageX = y_pageX - x_width * 0.5 + padding;
+  const x_maxPageX = y_pageX + y_width - x_width * 0.5 - padding;
+  const x_minPageY = y_pageY - x_height * 0.5 + padding;
+  const x_maxPageY = y_pageY + y_height - x_height * 0.5 - padding;
+  if (
+    x_pageX >= x_minPageX &&
+    x_pageX <= x_maxPageX &&
+    x_pageY >= x_minPageY &&
+    x_pageY <= x_maxPageY
+  )
+    return true;
+  return false;
 };

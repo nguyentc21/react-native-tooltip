@@ -14,8 +14,6 @@ This Tooltip is built on [@nguyentc21/react-native-modal-view](https://github.co
 
 ## Usage
 
-First, you must install and setup [@nguyentc21/react-native-modal-view](https://github.com/nguyentc21/react-native-modal-view)
-
 ```tsx
 import Tooltip from '@nguyentc21/react-native-tooltip';
 
