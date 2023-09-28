@@ -63,6 +63,7 @@ export type TooltipProps = Omit<NestedModalProps, 'id' | 'visible'> & {
 };
 export type TooltipRef = {
   show(): void;
+  hide(): void;
 };
 
 const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
@@ -136,6 +137,7 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
 
   useImperativeHandle(forwardedRef, () => ({
     show: _show,
+    hide: _hide,
   }));
 
   const _props =
