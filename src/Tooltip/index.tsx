@@ -14,7 +14,11 @@ import styles from './styles';
 import { getCaretWidth } from './functions';
 
 import type { ReactNode } from 'react';
-import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
+import type {
+  LayoutChangeEvent,
+  LayoutRectangle,
+  ViewProps,
+} from 'react-native';
 import type { NestedModalProps } from '@nguyentc21/react-native-modal-view';
 
 const defaultLayoutRectangle: LayoutRectangle = {
@@ -47,20 +51,21 @@ export type EdgeInsets = {
   bottom: number;
   left: number;
 };
-export type TooltipProps = Omit<NestedModalProps, 'id' | 'visible'> & {
-  id?: NestedModalProps['id'];
-  content?: ReactNode;
-  color?: string;
-  backdropColor?: string;
-  placement?: 'top' | 'bottom' | 'left' | 'right';
-  forcePlacement?: boolean;
-  caretSize?: number;
-  disabled?: boolean;
-  safeAreaInsets?: EdgeInsets;
-  extraData?: any;
-  hideCaret?: boolean;
-  actionType?: 'onPress' | 'onLongPress';
-};
+export type TooltipProps = ViewProps &
+  Omit<NestedModalProps, 'id' | 'visible'> & {
+    id?: NestedModalProps['id'];
+    content?: ReactNode;
+    color?: string;
+    backdropColor?: string;
+    placement?: 'top' | 'bottom' | 'left' | 'right';
+    forcePlacement?: boolean;
+    caretSize?: number;
+    disabled?: boolean;
+    safeAreaInsets?: EdgeInsets;
+    extraData?: any;
+    hideCaret?: boolean;
+    actionType?: 'onPress' | 'onLongPress';
+  };
 export type TooltipRef = {
   show(): void;
   hide(): void;
@@ -80,6 +85,7 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     extraData,
     hideCaret,
     actionType = 'onPress',
+    ...viewProps
   } = props;
 
   const [tooltipContentLayoutState, setTooltipContentLayoutState] =
@@ -149,7 +155,12 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
 
   return (
     <>
-      <Pressable ref={contentRef} disabled={!!disabled} {..._props}>
+      <Pressable
+        ref={contentRef}
+        disabled={!!disabled}
+        {...viewProps}
+        {..._props}
+      >
         {props.children}
       </Pressable>
       <NestedModal
