@@ -1,6 +1,6 @@
 {
   "name": "@nguyentc21/react-native-tooltip",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Simple tooltip for React native app",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -84,7 +84,7 @@
     "react-native": "*"
   },
   "engines": {
-    "node": ">= 18.0.0"
+    "node": ">= 16.0.0"
   },
   "packageManager": "^yarn@1.22.15",
   "jest": {
