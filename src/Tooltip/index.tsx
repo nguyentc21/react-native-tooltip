@@ -5,7 +5,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import { View, Pressable } from 'react-native';
+import { View, Pressable, Keyboard } from 'react-native';
 import { NestedModal } from '@nguyentc21/react-native-modal-view';
 
 import usePosition from './usePosition';
@@ -122,11 +122,13 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
   }, [extraData, targetContentLayoutState, tooltipContentLayoutState]);
 
   const _onOpen = () => {
+    Keyboard.dismiss();
     if (contentRef.current?.measure) {
       contentRef.current.measure((x, y, width, height, pageX, pageY) => {
         setTargetContentLayoutState({ x, y, width, height, pageX, pageY });
       });
     }
+    props.onOpen?.();
   };
 
   const _onTooltipLayout = (e: LayoutChangeEvent) => {

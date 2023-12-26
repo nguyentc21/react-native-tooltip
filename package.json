@@ -1,6 +1,6 @@
 {
   "name": "@nguyentc21/react-native-tooltip",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Simple tooltip for React native app",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -38,6 +38,7 @@
   "keywords": [
     "react-native",
     "nguyentc21",
+    "@nguyentc21",
     "@nguyentc21/react-native-tooltip",
     "react-native-tooltip",
     "tooltip"
