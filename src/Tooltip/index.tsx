@@ -65,6 +65,7 @@ export type TooltipProps = ViewProps &
     extraData?: any;
     hideCaret?: boolean;
     actionType?: 'onPress' | 'onLongPress';
+    visible?: boolean;
   };
 export type TooltipRef = {
   show(): void;
@@ -85,6 +86,7 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     extraData,
     hideCaret,
     actionType = 'onPress',
+    visible,
     ...viewProps
   } = props;
 
@@ -154,7 +156,8 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
       : 'onLongPress'
       ? { onLongPress: _show }
       : {};
-
+  
+  const _visible = visible ?? visibleState
   return (
     <>
       <Pressable
@@ -167,7 +170,7 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
       </Pressable>
       <NestedModal
         {...props}
-        visible={visibleState}
+        visible={_visible}
         close={_hide}
         onOpen={_onOpen}
         containerStyle={[
