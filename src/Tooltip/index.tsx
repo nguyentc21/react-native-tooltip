@@ -21,12 +21,6 @@ import type {
 } from 'react-native';
 import type { NestedModalProps } from '@nguyentc21/react-native-modal-view';
 
-const defaultLayoutRectangle: LayoutRectangle = {
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0,
-};
 export interface MeasureType {
   x: number;
   y: number;
@@ -90,17 +84,12 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     ...viewProps
   } = props;
 
-  const [tooltipContentLayoutState, setTooltipContentLayoutState] =
-    useState<LayoutRectangle>(defaultLayoutRectangle);
-  const [targetContentLayoutState, setTargetContentLayoutState] =
-    useState<MeasureType>({
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-      pageX: 0,
-      pageY: 0,
-    });
+  const [tooltipContentLayoutState, setTooltipContentLayoutState] = useState<
+    LayoutRectangle | undefined
+  >();
+  const [targetContentLayoutState, setTargetContentLayoutState] = useState<
+    MeasureType | undefined
+  >();
   const [visibleState, setVisibleState] = useState(false);
   const [readyKeyState, setReadyKeyState] = useState(0);
 
@@ -121,15 +110,13 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
 
   useEffect(() => {
     setReadyKeyState(Math.random());
-  }, [extraData, targetContentLayoutState, tooltipContentLayoutState]);
+  }, [extraData, contentPosition, caretPosition]);
 
   const _onOpen = () => {
     Keyboard.dismiss();
-    if (contentRef.current?.measure) {
-      contentRef.current.measure((x, y, width, height, pageX, pageY) => {
-        setTargetContentLayoutState({ x, y, width, height, pageX, pageY });
-      });
-    }
+    contentRef.current?.measure?.((x, y, width, height, pageX, pageY) => {
+      setTargetContentLayoutState({ x, y, width, height, pageX, pageY });
+    });
     props.onOpen?.();
   };
 
@@ -153,11 +140,11 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
   const _props =
     actionType === 'onPress'
       ? { onPress: _show }
-      : 'onLongPress'
+      : actionType === 'onLongPress'
       ? { onLongPress: _show }
       : {};
-  
-  const _visible = visible ?? visibleState
+
+  const _visible = visible ?? visibleState;
   return (
     <>
       <Pressable
@@ -182,13 +169,16 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
             marginTop: 0,
             position: 'absolute',
             backgroundColor: color,
-            top: contentPosition.top,
-            left: contentPosition.left,
+            top: contentPosition?.top,
+            left: contentPosition?.left,
             borderRadius: DEFAULT_BORDER_RADIUS,
             overflow: 'visible',
             padding: tooltipContentPadding,
           },
-          !!contentPosition.hidden && { display: 'none' },
+          !!contentPosition?.hidden && { display: 'none' },
+          contentPosition == undefined && {
+            opacity: 0,
+          },
           containerStyle,
         ]}
         backdropStyle={[
@@ -199,20 +189,22 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
         ]}
         onMainContentLayout={_onTooltipLayout}
         wrapContent={
-          <View
-            style={[
-              {
-                position: 'absolute',
-                backgroundColor: color,
-                top: caretPosition.top,
-                left: caretPosition.left,
-                transform: [{ rotate: '45deg' }],
-                width: caretSize,
-                height: caretSize,
-              },
-              !!caretPosition.hidden && { display: 'none' },
-            ]}
-          />
+          !caretPosition ? null : (
+            <View
+              style={[
+                {
+                  position: 'absolute',
+                  backgroundColor: color,
+                  top: caretPosition.top,
+                  left: caretPosition.left,
+                  transform: [{ rotate: '45deg' }],
+                  width: caretSize,
+                  height: caretSize,
+                },
+                !!caretPosition.hidden && { display: 'none' },
+              ]}
+            />
+          )
         }
         children={props.content}
         updateKey={readyKeyState}

@@ -311,7 +311,7 @@ export const getCaretPosition = (args: {
 export const checkIsXInsideY = (
   xMeasure: MeasureType,
   yMeasure: MeasureType,
-  padding: number = 0
+  padding: number = 0,
 ) => {
   const {
     pageX: x_pageX,

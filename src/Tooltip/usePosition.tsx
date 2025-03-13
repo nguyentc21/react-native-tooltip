@@ -16,11 +16,11 @@ import type { PositionType } from './functions';
 const usePosition = (
   props: Pick<TooltipProps, 'placement' | 'forcePlacement'> & {
     safeAreaInsets: EdgeInsets;
-    targetContentLayout: MeasureType;
-    tooltipContentLayout: LayoutRectangle;
+    targetContentLayout?: MeasureType;
+    tooltipContentLayout?: LayoutRectangle;
     caretSize: number;
     hideCaret?: boolean;
-  }
+  },
 ) => {
   const {
     placement,
@@ -31,22 +31,19 @@ const usePosition = (
     safeAreaInsets,
     hideCaret,
   } = props;
-  const [contentState, setContentState] = useState({
-    top: 0,
-    left: 0,
-    hidden: false,
-  });
-  const [caretState, setCaretState] = useState({
-    top: 0,
-    left: 0,
-    hidden: false,
-  });
+  const [contentState, setContentState] = useState<PositionType | undefined>(
+    undefined,
+  );
+  const [caretState, setCaretState] = useState<PositionType | undefined>(
+    undefined,
+  );
 
   const dimension = useWindowDimensions();
 
   const _checkIsCaretNeedHidden = (
     caretPosition: PositionType,
-    tooltipPosition: PositionType
+    tooltipPosition: PositionType,
+    tooltipContentLayout: LayoutRectangle,
   ) => {
     if (!!caretPosition.hidden) return true;
     const caretWidth = getCaretWidth(caretSize);
@@ -71,11 +68,13 @@ const usePosition = (
         x: 0,
         y: 0,
       },
-      padding
+      padding,
     );
   };
 
   useEffect(() => {
+    if (!targetContentLayout || !tooltipContentLayout) return;
+
     const _finalPlacement = getTheFinalPlacement({
       targetContentLayout,
       tooltipContentLayout,
@@ -109,7 +108,8 @@ const usePosition = (
     });
     const isCaretNeedHidden = _checkIsCaretNeedHidden(
       caretPosition,
-      tooltipPosition
+      tooltipPosition,
+      tooltipContentLayout,
     );
 
     setContentState({
