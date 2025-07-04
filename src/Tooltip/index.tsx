@@ -17,7 +17,8 @@ import type { ReactNode } from 'react';
 import type {
   LayoutChangeEvent,
   LayoutRectangle,
-  ViewProps,
+  PressableProps,
+  GestureResponderEvent,
 } from 'react-native';
 import type { NestedModalProps } from '@nguyentc21/react-native-modal-view';
 
@@ -45,7 +46,7 @@ export type EdgeInsets = {
   bottom: number;
   left: number;
 };
-export type TooltipProps = ViewProps &
+export type TooltipProps = PressableProps &
   Omit<NestedModalProps, 'id' | 'visible'> & {
     id?: NestedModalProps['id'];
     content?: ReactNode;
@@ -54,7 +55,6 @@ export type TooltipProps = ViewProps &
     placement?: 'top' | 'bottom' | 'left' | 'right';
     forcePlacement?: boolean;
     caretSize?: number;
-    disabled?: boolean;
     safeAreaInsets?: EdgeInsets;
     extraData?: any;
     hideCaret?: boolean;
@@ -81,6 +81,8 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     hideCaret,
     actionType = 'onPress',
     visible,
+    onPress,
+    onLongPress,
     ...viewProps
   } = props;
 
@@ -137,21 +139,30 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     hide: _hide,
   }));
 
-  const _props =
+  const _onPress =
     actionType === 'onPress'
-      ? { onPress: _show }
-      : actionType === 'onLongPress'
-      ? { onLongPress: _show }
-      : {};
+      ? (e: GestureResponderEvent) => {
+          _show();
+          onPress?.(e);
+        }
+      : undefined;
+
+  const _onLongPress =
+    actionType === 'onLongPress'
+      ? (e: GestureResponderEvent) => {
+          _show();
+          onLongPress?.(e);
+        }
+      : undefined;
 
   const _visible = visible ?? visibleState;
   return (
     <>
       <Pressable
         ref={contentRef}
-        disabled={!!disabled}
         {...viewProps}
-        {..._props}
+        onPress={_onPress}
+        onLongPress={_onLongPress}
       >
         {props.children}
       </Pressable>
