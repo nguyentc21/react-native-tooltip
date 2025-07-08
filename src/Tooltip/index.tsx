@@ -71,7 +71,6 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     containerStyle,
     backdropStyle,
     forcePlacement,
-    disabled,
     color = '#fff',
     backdropColor = 'rgba(0,0,0,0.5)',
     placement = 'top',
@@ -83,7 +82,7 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     visible,
     onPress,
     onLongPress,
-    ...viewProps
+    ..._pressableProps
   } = props;
 
   const [tooltipContentLayoutState, setTooltipContentLayoutState] = useState<
@@ -160,7 +159,7 @@ const Tooltip = forwardRef<TooltipRef, TooltipProps>((props, forwardedRef) => {
     <>
       <Pressable
         ref={contentRef}
-        {...viewProps}
+        {..._pressableProps}
         onPress={_onPress}
         onLongPress={_onLongPress}
       >
