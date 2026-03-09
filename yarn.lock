@@ -1705,10 +1705,10 @@
   resolved "https://registry.yarnpkg.com/@nguyentc21/event-listener/-/event-listener-1.0.3.tgz#49937fe07d120792bcf75f637a9b21b6a7469277"
   integrity sha512-o6155uRsaygmjSKEok3IVc0RopOlrK/yY2ZVjgG8alhR89WQRORAKHMCrdzXWZz2oBuL62EPpYHcRB+k6b3VxA==
 
-"@nguyentc21/react-native-modal-view@1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@nguyentc21/react-native-modal-view/-/react-native-modal-view-1.1.4.tgz#5a333fff082efabb07a63d0b46e762944964be37"
-  integrity sha512-Ob8tF+nrwMehNNtSqv2B+iCGEVRthg1LJM6xQW8MUL4e+H64i6mX4NqwDJVlVmOlNl6IIP6CQNnd9KGvYkH6cg==
+"@nguyentc21/react-native-modal-view@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@nguyentc21/react-native-modal-view/-/react-native-modal-view-2.0.4.tgz#5fb4f9bb85deee60b0f860532479b7984ca6908f"
+  integrity sha512-F0XToLMwGL6ZDfKXVkrnFmWpNcAvFoBmtA0PvgQJWaNDA2VcQCIskUnk9E4szWNhkGHgvLWEYvLiuL7dsgmK3Q==
   dependencies:
     "@nguyentc21/event-listener" "^1.0.0"
     react-native-ntc-pressable "^1.0.0"

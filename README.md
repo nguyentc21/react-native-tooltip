@@ -15,31 +15,56 @@ This Tooltip is built on [@nguyentc21/react-native-modal-view](https://github.co
 ## Usage
 
 ```tsx
-import Tooltip from '@nguyentc21/react-native-tooltip';
+import ModalSection from '@nguyentc21/react-native-modal-view';
+// ...
+const App = () => {
+  return (
+    // ...
 
+    <ModalSection // should be on bottom
+      enable
+      // safeAreaInsets={safeAreaInsets}
+      // keyboardHeight={keyboardHeight}
+      // defaultModalProps={{
+      //   blurToClose: true,
+      //   styles: {
+      //     backgroundColor: '#eeeeee',
+      //     borderRadius: 0,
+      //     borderTopLeftRadius: 0,
+      //     borderTopRightRadius: 0,
+      //   },
+      //   contentContainerStyle: {
+      //     padding: 20,
+      //   },
+      // }}
+    />
+  );
+};
+// ...
+```
+
+```tsx
+import Tooltip from '@nguyentc21/react-native-tooltip';
 // ...
 export function NiceView(props: Props) {
   // ...
   return (
-    <>
-      {/* ... */}
-      <Tooltip
-        // disabled
-        placement="bottom"
-        content={
-          <Text style={[styles.text, { color: colors.RED40 }]}>
-            Tooltip message.
-          </Text>
-        }
-      >
-        <View style={{ padding: 20, backgroundColor: '#fff' }}>
-          <Text>Press me to see the tooltip!</Text>
-        </View>
-      </Tooltip>
-      {/* ... */}
-    </>
+    // ...
+    <Tooltip
+      placement="bottom"
+      content={
+        <Text
+          style={[styles.text, { color: colors.RED40, textAlign: 'center' }]}
+        >
+          Tooltip content.
+        </Text>
+      }
+    >
+      <Text>Press me to see the tooltip!</Text>
+    </Tooltip>
   );
-}
+};
+// ...
 ```
 
 ## Contributing
