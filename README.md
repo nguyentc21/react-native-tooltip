@@ -8,9 +8,11 @@ Simple tooltip for React native app
 yarn add @nguyentc21/react-native-tooltip
 ```
 
-## Required
-
 This Tooltip is built on [@nguyentc21/react-native-modal-view](https://github.com/nguyentc21/react-native-modal-view). So you must install it first.
+
+```sh
+yarn add @nguyentc21/react-native-modal-view
+```
 
 ## Usage
 
@@ -20,23 +22,8 @@ import ModalSection from '@nguyentc21/react-native-modal-view';
 const App = () => {
   return (
     // ...
-
     <ModalSection // should be on bottom
       enable
-      // safeAreaInsets={safeAreaInsets}
-      // keyboardHeight={keyboardHeight}
-      // defaultModalProps={{
-      //   blurToClose: true,
-      //   styles: {
-      //     backgroundColor: '#eeeeee',
-      //     borderRadius: 0,
-      //     borderTopLeftRadius: 0,
-      //     borderTopRightRadius: 0,
-      //   },
-      //   contentContainerStyle: {
-      //     padding: 20,
-      //   },
-      // }}
     />
   );
 };
@@ -63,7 +50,7 @@ export function NiceView(props: Props) {
       <Text>Press me to see the tooltip!</Text>
     </Tooltip>
   );
-};
+}
 // ...
 ```
 
