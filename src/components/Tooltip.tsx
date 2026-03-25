@@ -16,7 +16,8 @@ import {
 import { NestedModal } from '@nguyentc21/react-native-modal-view';
 
 import Caret from './Caret';
-import usePosition from '../hooks/usePosition';
+import { useCaretPosition, useTooltipPosition } from '../hooks/usePosition';
+import useFinalPlacement from '../hooks/useFinalPlacement';
 import useContainerStyles from '../hooks/useContainerStyles';
 import useContentContainerStyles from '../hooks/useContentContainerStyles';
 import useOffsetViewStyles from '../hooks/useOffsetViewStyles';
@@ -49,30 +50,31 @@ type TooltipHandler = {
   hide(): void;
 };
 
-type TooltipProps = PressableProps & {
-  modalContainerStyle?: ViewProps['style'];
-  containerStyle?: ViewProps['style'];
-  contentContainerStyle?: ViewProps['style'];
+type TooltipProps = PressableProps &
+  Pick<NestedModalProps, 'onClose' | 'onOpen' | 'onDidOpen'> & {
+    modalContainerStyle?: ViewProps['style'];
+    containerStyle?: ViewProps['style'];
+    contentContainerStyle?: ViewProps['style'];
 
-  visible?: boolean;
-  content: ReactNode;
+    visible?: boolean;
+    content: ReactNode;
 
-  backgroundColor?: string;
-  backdropColor?: string;
-  borderRadius?: number;
+    backgroundColor?: string;
+    backdropColor?: string;
+    borderRadius?: number;
 
-  placement?: Placement;
-  forcePlacement?: boolean;
-  caretSize?: number;
-  hideCaret?: boolean;
-  offset?: number;
-  screenPadding?: number;
+    placement?: Placement;
+    forcePlacement?: boolean;
+    caretSize?: number;
+    hideCaret?: boolean;
+    offset?: number;
+    screenPadding?: number;
 
-  actionType?: 'onPress' | 'onLongPress';
+    actionType?: 'onPress' | 'onLongPress';
 
-  extraData?: unknown;
-  expose?(handler?: TooltipHandler): void;
-};
+    extraData?: unknown;
+    expose?(handler?: TooltipHandler): void;
+  };
 
 function Tooltip(props: TooltipProps) {
   const {
@@ -93,6 +95,9 @@ function Tooltip(props: TooltipProps) {
     modalContainerStyle,
     containerStyle,
     contentContainerStyle,
+    onClose,
+    onOpen,
+    onDidOpen,
     ...pressableProps
   } = props;
   const _caretSize = !hideCaret ? caretSize : 0;
@@ -132,7 +137,45 @@ function Tooltip(props: TooltipProps) {
     };
   }, [tooltipContentLayoutState, tooltipContainerLayoutState]);
 
+  const finalPlacement = useFinalPlacement({
+    safeAreaInsets: safeAreaInsetsState,
+    dimension: windowDimensions,
+    placement,
+    forcePlacement,
+    targetContentLayout: targetContentLayoutState,
+    tooltipContentLayout,
+    borderRadius,
+  });
+  const tooltipPosition = useTooltipPosition({
+    safeAreaInsets: safeAreaInsetsState,
+    dimension: windowDimensions,
+    placement: finalPlacement,
+    targetContentLayout: targetContentLayoutState,
+    tooltipContentLayout,
+  });
+  const caretPosition = useCaretPosition({
+    placement: finalPlacement,
+    targetContentLayout: targetContentLayoutState,
+    tooltipContentLayout,
+    caretSize: _caretSize,
+  });
+
+  const { containerStyles, wrapContainerStyles } = useContainerStyles({
+    tooltipPosition,
+    placement: finalPlacement,
+  });
+  const contentContainerStyles = useContentContainerStyles({
+    caretSize: _caretSize,
+    borderRadius,
+  });
+  const offsetViewStyles = useOffsetViewStyles({
+    caretSize: _caretSize,
+    placement: finalPlacement,
+    offset,
+  });
+
   const _onOpen = useStableCallback(() => {
+    onOpen?.();
     Keyboard.dismiss();
     contentRef.current?.measure?.((x, y, width, height, pageX, pageY) => {
       setTargetContentLayoutState({ x, y, width, height, pageX, pageY });
@@ -163,43 +206,19 @@ function Tooltip(props: TooltipProps) {
     onLongPress?.(e);
   });
 
-  const { tooltipPosition, caretPosition, finalPlacement } = usePosition({
-    safeAreaInsets: safeAreaInsetsState,
-    dimension: windowDimensions,
-    placement,
-    forcePlacement,
-    targetContentLayout: targetContentLayoutState,
-    tooltipContentLayout,
-    caretSize: _caretSize,
-    borderRadius,
-  });
-
-  const { containerStyles, wrapContainerStyles } = useContainerStyles({
-    tooltipPosition,
-    placement: finalPlacement,
-  });
-  const contentContainerStyles = useContentContainerStyles({
-    caretSize: _caretSize,
-    borderRadius,
-  });
-  const offsetViewStyles = useOffsetViewStyles({
-    caretSize: _caretSize,
-    placement: finalPlacement,
-    offset,
-  });
-
-  const _getModalLayoutData: NestedModalProps['getLayoutData'] = useCallback(
-    (data) => {
-      const { safeAreaInsets } = data;
-      setSafeAreaInsetsState({
-        top: screenPadding + (safeAreaInsets.top || 0),
-        bottom: screenPadding + (safeAreaInsets.bottom || 0),
-        left: screenPadding + (safeAreaInsets.left || 0),
-        right: screenPadding + (safeAreaInsets.right || 0),
-      });
-    },
-    [screenPadding]
-  );
+  const _getModalLayoutData: NonNullable<NestedModalProps['getLayoutData']> =
+    useCallback(
+      (data) => {
+        const { safeAreaInsets } = data;
+        setSafeAreaInsetsState({
+          top: screenPadding + (safeAreaInsets.top || 0),
+          bottom: screenPadding + (safeAreaInsets.bottom || 0),
+          left: screenPadding + (safeAreaInsets.left || 0),
+          right: screenPadding + (safeAreaInsets.right || 0),
+        });
+      },
+      [screenPadding]
+    );
 
   useEffect(() => {
     if (!expose) return;
@@ -221,6 +240,10 @@ function Tooltip(props: TooltipProps) {
     tooltipPosition?.bottom,
     tooltipPosition?.left,
     tooltipPosition?.right,
+    caretPosition?.top,
+    caretPosition?.bottom,
+    caretPosition?.left,
+    caretPosition?.right,
   ]);
 
   return (
@@ -239,6 +262,8 @@ function Tooltip(props: TooltipProps) {
         visible={_visible}
         close={_hide}
         onOpen={_onOpen}
+        onDidOpen={onDidOpen}
+        onClose={onClose}
         getLayoutData={_getModalLayoutData}
         containerStyle={[
           lStyles.tooltipContainerStyle,
